@@ -14,14 +14,16 @@
     "postinstall": "npm run build:icons"
   },
   "dependencies": {
+    "@chakra-ui/react": "^2.8.2",
     "@emotion/cache": "11.11.0",
-    "@emotion/react": "11.11.4",
-    "@emotion/styled": "11.11.5",
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
     "@floating-ui/react": "0.26.17",
     "@mui/lab": "5.0.0-alpha.170",
     "@mui/material": "5.15.20",
     "@mui/material-nextjs": "5.15.11",
     "classnames": "2.5.1",
+    "framer-motion": "^11.3.2",
     "next": "^14.2.4",
     "react": "18.3.1",
     "react-colorful": "5.6.1",
