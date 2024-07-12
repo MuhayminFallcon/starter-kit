@@ -1,49 +1,114 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  CircularProgress,
+  Typography
+} from '@mui/material';
+
+interface Article {
+  id: number;
+  title: string;
+  description: string;
+  image: string;
+  images: string[]; // Assuming each Article has an array of image URLs
+}
 
 const CompaniesTable = () => {
-  const [companies, setCompanies] = useState([]);
+  const [data, setData] = useState<Article[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-  async function fetchData() {
-    try {
-      const response = await axios.get('http://localhost:5272/api/companys');
-      setCompanies(response.data.data);
-    } catch (error) {
-      console.error('Error fetching companies data:', error);
-    }
+    const fetchData = async () => {
+      try {
+        const response = await axios.get<{ data: Article[] }>('http://100.42.190.178:5532/api/articles');
+        setData(response.data.data); // Assuming the response structure has a `data` field containing the array of articles
+      } catch (error) {
+        setError(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div style={{ textAlign: 'center', marginTop: '50px' }}>
+        <CircularProgress />
+      </div>
+    );
   }
 
-  fetchData();
-}, []);
+  if (error) {
+    return (
+      <Typography color="error" variant="h6" align="center" style={{ marginTop: '20px' }}>
+        {`Error: ${error.message}`}
+      </Typography>
+    );
+  }
+
+  // Handling case where data is empty
+  if (data.length === 0) {
+    return (
+      <Typography variant="body1" align="center" style={{ marginTop: '20px' }}>
+        No data available
+      </Typography>
+    );
+  }
 
   return (
-    <table>
-      <thead>
-      <tr>
-        <th>Name</th>
-        <th>Description</th>
-        <th>Phone Number</th>
-        <th>Email</th>
-        <th>Address</th>
-        <th>Website</th>
-        <th>Hours of Operation</th>
-      </tr>
-      </thead>
-      <tbody>
-      {companies.map((company) => (
-        <tr key={company.id}>
-          <td>{company.name}</td>
-          <td>{company.description}</td>
-          <td>{company.phoneNumber}</td>
-          <td>{company.emailAddress}</td>
-          <td>{company.address}</td>
-          <td>{company.websiteUrl || 'N/A'}</td>
-          <td>{company.hoursOfOperation}</td>
-        </tr>
-      ))}
-      </tbody>
-    </table>
+    <TableContainer component={Paper} style={{ marginTop: '20px' }}>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Title</TableCell>
+            <TableCell>Description</TableCell>
+            <TableCell>Image</TableCell>
+            <TableCell>Images</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {data.map((item) => (
+            <TableRow key={item.id}>
+              <TableCell>{item.title}</TableCell>
+              <TableCell>{item.description}</TableCell>
+              <TableCell>
+                <img src={`http://${item.image}`} alt={item.image} style={{ width: '60px', height: 'auto' }} />
+              </TableCell>
+              <TableCell>
+                <div style={{ position: 'relative', width: '100px', height: '100px' }}>
+                  {item.images.map((image, index) => (
+                    <img
+                      key={index}
+                      src={`http://${image}`}
+                      alt={image}
+                      style={{
+                        position: 'absolute',
+                        width: '60px',
+                        height: '60px',
+                        objectFit: 'cover',
+                        zIndex: index + 1,
+                        right: `${index * 4}px`, 
+                        top: `${index * 4}px`
+                      }}
+                    />
+                  ))}
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 };
 
