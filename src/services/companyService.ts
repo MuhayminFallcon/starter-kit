@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-const API_URL = 'http://192.168.31.86:5152/api';
+export const API_URL = 'http://192.168.31.86:5152/api';
 
-interface Company {
+export interface Company {
   name: string;
   subDomain: string;
   heroTitle: string;
@@ -28,7 +28,7 @@ interface Company {
   creationDate: string;
 }
 
-interface CompaniesResponse {
+export interface CompaniesResponse {
   data: Company[];
   pagesCount: number;
   currentPage: number;
@@ -36,12 +36,13 @@ interface CompaniesResponse {
   totalCount: number;
 }
 
-export const fetchCompanies = async (): Promise<CompaniesResponse> => {
-  const response = await axios.get<CompaniesResponse>(`${API_URL}/companies`, {
-    headers: {
-      'Accept': 'text/plain',
-    },
-  });
-
-  return response.data;
-};
+export class CompanyService {
+  static async fetchCompanies(): Promise<CompaniesResponse> {
+    const response = await axios.get<CompaniesResponse>(`${API_URL}/companies`, {
+      headers: {
+        'Accept': 'text/plain',
+      },
+    });
+    return response.data;
+  }
+}

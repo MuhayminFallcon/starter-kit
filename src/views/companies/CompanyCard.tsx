@@ -1,21 +1,8 @@
-// src/views/companies/CompanyCard.tsx
-
 import React, { useState, useEffect } from 'react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  CircularProgress,
-  Typography
-} from '@mui/material';
-import { fetchCompanies } from '@/services/companyService';
-import type { Company } from '@/services/companyService'; // Import the Company interface
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Typography } from '@mui/material';
+import { CompanyService, Company } from '@/services/companyService';
 
-const CompaniesTable = () => {
+const CompanyCard = () => {
   const [data, setData] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -23,7 +10,7 @@ const CompaniesTable = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetchCompanies();
+        const response = await CompanyService.fetchCompanies();
         setData(response.data);
       } catch (error) {
         setError(error);
@@ -45,30 +32,26 @@ const CompaniesTable = () => {
 
   if (error) {
     return (
-      <Typography color="error" variant="h6" align="center" style={{ marginTop: '20px' }}>
-        {`Error: ${error.message}`}
-      </Typography>
-    );
-  }
-
-  if (data.length === 0) {
-    return (
-      <Typography variant="body1" align="center" style={{ marginTop: '20px' }}>
-        No data available
-      </Typography>
+      <div style={{ textAlign: 'center', marginTop: '50px' }}>
+        <Typography variant="h6" color="error">
+          {error.message}
+        </Typography>
+      </div>
     );
   }
 
   return (
-    <TableContainer component={Paper} style={{ marginTop: '20px' }}>
+    <TableContainer component={Paper}>
       <Table>
         <TableHead>
           <TableRow>
             <TableCell>Name</TableCell>
             <TableCell>SubDomain</TableCell>
+            <TableCell>Hero Title</TableCell>
             <TableCell>Hero Description</TableCell>
-            <TableCell>Hero Image</TableCell>
-            <TableCell>Logo Image</TableCell>
+            <TableCell>Location</TableCell>
+            <TableCell>Email Contact</TableCell>
+            <TableCell>Phone Contact</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -76,13 +59,11 @@ const CompaniesTable = () => {
             <TableRow key={company.id}>
               <TableCell>{company.name}</TableCell>
               <TableCell>{company.subDomain}</TableCell>
+              <TableCell>{company.heroTitle}</TableCell>
               <TableCell>{company.heroDescription}</TableCell>
-              <TableCell>
-                <img src={company.heroImage} alt={company.heroTitle} style={{ width: '60px', height: 'auto' }} />
-              </TableCell>
-              <TableCell>
-                <img src={company.logoImage} alt={company.name} style={{ width: '60px', height: 'auto' }} />
-              </TableCell>
+              <TableCell>{company.location}</TableCell>
+              <TableCell>{company.emailContact}</TableCell>
+              <TableCell>{company.phoneContact}</TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -91,4 +72,4 @@ const CompaniesTable = () => {
   );
 };
 
-export default CompaniesTable;
+export default CompanyCard;
