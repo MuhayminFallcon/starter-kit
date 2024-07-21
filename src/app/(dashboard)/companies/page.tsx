@@ -1,8 +1,13 @@
 "use client";
 
-import CompanyCard from '@views/companies/CompanyCard'
+import CompanyCard from '@views/companies/CompanyCard';
+import AddComponent from '@components/companies/AddComponent';
 
 export default function Page() {
-  return <CompanyCard />
+  return (
+    <div>
+      <AddComponent />
+      <CompanyCard />
+    </div>
+  );
 }
-

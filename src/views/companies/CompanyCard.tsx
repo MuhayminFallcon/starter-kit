@@ -1,5 +1,6 @@
+// src/views/companies/CompanyCard.tsx
+
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import {
   Table,
   TableBody,
@@ -11,25 +12,19 @@ import {
   CircularProgress,
   Typography
 } from '@mui/material';
-
-interface Article {
-  id: number;
-  title: string;
-  description: string;
-  image: string;
-  images: string[]; // Assuming each Article has an array of image URLs
-}
+import { fetchCompanies } from '@/services/companyService';
+import type { Company } from '@/services/companyService'; // Import the Company interface
 
 const CompaniesTable = () => {
-  const [data, setData] = useState<Article[]>([]);
+  const [data, setData] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get<{ data: Article[] }>('http://100.42.190.178:5532/api/articles');
-        setData(response.data.data); // Assuming the response structure has a `data` field containing the array of articles
+        const response = await fetchCompanies();
+        setData(response.data);
       } catch (error) {
         setError(error);
       } finally {
@@ -56,7 +51,6 @@ const CompaniesTable = () => {
     );
   }
 
-  // Handling case where data is empty
   if (data.length === 0) {
     return (
       <Typography variant="body1" align="center" style={{ marginTop: '20px' }}>
@@ -70,39 +64,24 @@ const CompaniesTable = () => {
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>Title</TableCell>
-            <TableCell>Description</TableCell>
-            <TableCell>Image</TableCell>
-            <TableCell>Images</TableCell>
+            <TableCell>Name</TableCell>
+            <TableCell>SubDomain</TableCell>
+            <TableCell>Hero Description</TableCell>
+            <TableCell>Hero Image</TableCell>
+            <TableCell>Logo Image</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {data.map((item) => (
-            <TableRow key={item.id}>
-              <TableCell>{item.title}</TableCell>
-              <TableCell>{item.description}</TableCell>
+          {data.map((company) => (
+            <TableRow key={company.id}>
+              <TableCell>{company.name}</TableCell>
+              <TableCell>{company.subDomain}</TableCell>
+              <TableCell>{company.heroDescription}</TableCell>
               <TableCell>
-                <img src={`http://${item.image}`} alt={item.image} style={{ width: '60px', height: 'auto' }} />
+                <img src={company.heroImage} alt={company.heroTitle} style={{ width: '60px', height: 'auto' }} />
               </TableCell>
               <TableCell>
-                <div style={{ position: 'relative', width: '100px', height: '100px' }}>
-                  {item.images.map((image, index) => (
-                    <img
-                      key={index}
-                      src={`http://${image}`}
-                      alt={image}
-                      style={{
-                        position: 'absolute',
-                        width: '60px',
-                        height: '60px',
-                        objectFit: 'cover',
-                        zIndex: index + 1,
-                        right: `${index * 4}px`, 
-                        top: `${index * 4}px`
-                      }}
-                    />
-                  ))}
-                </div>
+                <img src={company.logoImage} alt={company.name} style={{ width: '60px', height: 'auto' }} />
               </TableCell>
             </TableRow>
           ))}
