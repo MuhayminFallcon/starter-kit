@@ -1,3 +1,4 @@
+// src/components/companies/CompanyForm.tsx
 import { useState } from 'react';
 import axios from 'axios';
 import CompanyFormLayout from './CompanyFormLayout';
@@ -17,7 +18,7 @@ const CompanyForm = ({ step, formData, setFormData }: CompanyFormProps) => {
       setUploading(true);
       try {
         const imagePaths = await uploadImage(value);
-        setFormData((prevData) => ({ ...prevData, [field]: imagePaths[0] })); // Handle single file path
+        setFormData((prevData) => ({ ...prevData, [field]: imagePaths }));
       } finally {
         setUploading(false);
       }
@@ -29,7 +30,7 @@ const CompanyForm = ({ step, formData, setFormData }: CompanyFormProps) => {
   const handleArrayChange = (arrayField: string, index: number, field: string, value: any) => {
     setFormData((prevData) => {
       const newArray = [...prevData[arrayField]];
-      newArray[index][field] = value;
+      newArray[index] = value;
       return { ...prevData, [arrayField]: newArray };
     });
   };
@@ -51,12 +52,18 @@ const CompanyForm = ({ step, formData, setFormData }: CompanyFormProps) => {
   const uploadImage = async (files: FileList | File[]): Promise<string[]> => {
     const formData = new FormData();
     const fileArray = Array.isArray(files) ? files : Array.from(files);
-    fileArray.forEach((file) => formData.append('files', file));
+    if (fileArray.length === 1) {
+      formData.append('file', fileArray[0]);
+    } else {
+      fileArray.forEach(file => formData.append('files', file));
+    }
+
     try {
       const response = await axios.post(`${API_URL}/file/multi`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      return response.data; // Assuming this is an array of image paths or URLs
+      // Assuming the server responds with the paths of the uploaded files
+      return response.data;
     } catch (error) {
       console.error('Error uploading image:', error);
       return [];
