@@ -1,5 +1,16 @@
 import { useState } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Tooltip, IconButton, CircularProgress, Snackbar, Alert } from '@mui/material';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Tooltip,
+  IconButton,
+  CircularProgress,
+  Snackbar,
+  Alert,
+} from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import CompanyForm from './CompanyForm';
 import CompanyStepper from './CompanyStepper';
@@ -34,26 +45,19 @@ export default function AddComponent() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
+  const handleClickOpen = () => setOpen(true);
   const handleClose = () => {
     setOpen(false);
-    setActiveStep(0); // Reset the step when the dialog is closed
-    setSuccess(false); // Reset success message
+    setActiveStep(0);
+    setSuccess(false);
   };
 
-  const handleNext = () => {
-    if (activeStep === steps.length - 1) {
-      handleSubmit(); // Submit the form if it's the last step
+  const handleStepChange = (stepChange: number) => {
+    if (activeStep === steps.length - 1 && stepChange === 1) {
+      handleSubmit();
     } else {
-      setActiveStep((prevActiveStep) => prevActiveStep + 1);
+      setActiveStep((prev) => prev + stepChange);
     }
-  };
-
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
   const handleSubmit = async () => {
@@ -61,11 +65,11 @@ export default function AddComponent() {
     try {
       await axios.post(`${API_URL}/companies`, formData, {
         headers: {
-          'Accept': 'application/json',
+          Accept: 'application/json',
           'Content-Type': 'application/json',
         },
       });
-      setSuccess(true); // Set success message
+      setSuccess(true);
       handleClose();
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -92,22 +96,18 @@ export default function AddComponent() {
         <DialogTitle>Add Company</DialogTitle>
         <DialogContent>
           <CompanyStepper steps={steps} activeStep={activeStep} />
-          <CompanyForm
-            step={activeStep}
-            formData={formData}
-            setFormData={setFormData}
-          />
-          {error && <p style={{ color: 'red' }}>{error}</p>}
+          <CompanyForm step={activeStep} formData={formData} setFormData={setFormData} />
+          {error && <Alert severity="error">{error}</Alert>}
           {loading && <CircularProgress />}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color="primary">
-            Close
-          </Button>
-          <Button disabled={activeStep === 0} onClick={handleBack} color="primary">
-            Back
-          </Button>
-          <Button onClick={handleNext} color="primary" disabled={loading}>
+          <Button onClick={handleClose} color="primary">Close</Button>
+          <Button disabled={activeStep === 0} onClick={() => handleStepChange(-1)} color="primary">Back</Button>
+          <Button
+            onClick={() => handleStepChange(1)}
+            color="primary"
+            disabled={loading}
+          >
             {activeStep === steps.length - 1 ? (loading ? <CircularProgress size={24} /> : 'Submit') : 'Next'}
           </Button>
         </DialogActions>
