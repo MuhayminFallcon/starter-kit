@@ -1,5 +1,5 @@
-// src/components/companies/CompanyFormLayout.tsx
-import { Box, TextField, Button } from '@mui/material';
+import { Box, TextField, Button, IconButton } from '@mui/material';
+import { Add, Remove } from '@mui/icons-material';
 
 type CompanyFormLayoutProps = {
   step: number;
@@ -10,7 +10,21 @@ type CompanyFormLayoutProps = {
   handleRemoveFromArray: (arrayField: string, index: number) => void;
 };
 
-const Field = ({ id, label, value, onChange, type = 'text', multiple = false }: { id: string; label: string; value: any; onChange: (field: string, value: any) => void; type?: string; multiple?: boolean }) => (
+const Field = ({
+                 id,
+                 label,
+                 value,
+                 onChange,
+                 type = 'text',
+                 multiple = false,
+               }: {
+  id: string;
+  label: string;
+  value: any;
+  onChange: (field: string, value: any) => void;
+  type?: string;
+  multiple?: boolean;
+}) => (
   <TextField
     label={label}
     variant="outlined"
@@ -56,8 +70,36 @@ const CompanyFormLayout = ({
     ),
     3: (
       <>
-        <Field id="productsImages" label="Product Image" value={formData.productsImage} onChange={handleChange} type="file" multiple />
+        <Field id="productsImages" label="Product Image" value={formData.productsImages} onChange={handleChange} type="file" multiple />
         <Field id="servicesImages" label="Service Image" value={formData.servicesImages} onChange={handleChange} type="file" multiple />
+        <Box>
+          <Button variant="contained" color="primary" onClick={() => handleAddToArray('features')}>
+            Add Feature
+          </Button>
+          {formData.features.map((feature: any, index: number) => (
+            <Box key={index} display="flex" alignItems="center" mb={2}>
+              <Field
+                id={`features[${index}].title`}
+                label="Feature Title"
+                value={feature.title}
+                onChange={(field, value) => handleArrayChange('features', index, 'title', value)}
+              />
+              <Field
+                id={`features[${index}].description`}
+                label="Feature Description"
+                value={feature.description}
+                onChange={(field, value) => handleArrayChange('features', index, 'description', value)}
+              />
+              <IconButton
+                aria-label="remove feature"
+                color="secondary"
+                onClick={() => handleRemoveFromArray('features', index)}
+              >
+                <Remove />
+              </IconButton>
+            </Box>
+          ))}
+        </Box>
       </>
     ),
     4: (
@@ -67,6 +109,7 @@ const CompanyFormLayout = ({
       </>
     ),
   };
+
   return (
     <Box sx={{ '& > :not(style)': { m: 1, width: '100%' } }} noValidate autoComplete="off" className="grid gap-4 mt-4 ">
       {stepFields[step]}

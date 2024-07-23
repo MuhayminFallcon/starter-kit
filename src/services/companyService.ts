@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const API_URL = 'http://localhost:5152/api';
+export const API_URL = 'http://192.168.31.86:5152/api';
 
 export interface Company {
   name: string;
