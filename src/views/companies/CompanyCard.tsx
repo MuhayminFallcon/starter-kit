@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Typography } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, IconButton } from '@mui/material';
 import { CompanyService, Company } from '@/services/companyService';
+import EditComponent from '@components/companies/EditCompany';
+import DeleteCompany from '@components/companies/DeleteCompany';
 
 const CompanyCard = () => {
   const [data, setData] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -13,7 +15,7 @@ const CompanyCard = () => {
         const response = await CompanyService.fetchCompanies();
         setData(response.data);
       } catch (error) {
-        setError("Somthing went wrong! can't fetch the data",error.message);
+        setError("Something went wrong! Can't fetch the data");
       } finally {
         setLoading(false);
       }
@@ -40,18 +42,18 @@ const CompanyCard = () => {
         <TableBody>
           {loading ? (
             <TableRow>
-              <TableCell colSpan={7} style={{ textAlign: 'center' }}>
+              <TableCell colSpan={8} style={{ textAlign: 'center' }}>
                 <CircularProgress />
               </TableCell>
             </TableRow>
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={7} style={{ textAlign: 'center', color: 'red' }}>
+              <TableCell colSpan={8} style={{ textAlign: 'center', color: 'red' }}>
                 {error}
               </TableCell>
             </TableRow>
           ) : (
-            data.map((company) => (
+            data.map((  company) => (
               <TableRow key={company.id}>
                 <TableCell>{company.name}</TableCell>
                 <TableCell>{company.subDomain}</TableCell>
@@ -61,8 +63,8 @@ const CompanyCard = () => {
                 <TableCell>{company.emailContact}</TableCell>
                 <TableCell>{company.phoneContact}</TableCell>
                 <TableCell className="flex gap-2 items-center">
-                  1. edit component/-id-
-                  2. delete component/-id-
+                  <EditComponent id={company.id}/>
+                  <DeleteCompany companyId={company.id} />
                 </TableCell>
               </TableRow>
             ))

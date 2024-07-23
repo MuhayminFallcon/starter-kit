@@ -1,36 +1,51 @@
-import { useState,useEffect  } from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  CircularProgress,
-  Snackbar,
-  Alert,
-  Collapse,
-  Typography,
-  Box,
-  TextField,
-  InputAdornment,
-} from '@mui/material';
-import RestartAltIcon from '@mui/icons-material/RestartAlt';
-import AddIcon from '@mui/icons-material/Add';
-import SearchIcon from '@mui/icons-material/Search';
-import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { API_URL } from '@/services/companyService';
-import CompanyForm from './CompanyForm';
-import CompanyStepper from './CompanyStepper';
+import { Box, Button, Collapse, Dialog, Snackbar, Alert, CircularProgress } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import SearchField from './SearchField';
+import FilterSection from './FilterSection';
+import CompanyDialog from './CompanyDialog';
+import { API_URL } from '@/services/companyService'
 
 const steps = ['Basic Information', 'Hero Section', 'Section Details', 'Products and Services', 'Additional Information'];
+
+interface FormData {
+  name: string;
+  subDomain: string;
+  location: string;
+  emailContact: string;
+  phoneContact: string;
+  heroTitle: string;
+  heroDescription: string;
+  heroImage: string;
+  tagline: string;
+  sectionImage: string;
+  sectionTitle: string;
+  sectionDescription: string;
+  productsImages: string[];
+  servicesImages: string[];
+  logoImage: string;
+  socialMediaLinks: string[];
+  features: { title: string; description: string }[];
+}
+
+interface FilterValues {
+  name: string;
+  subDomain: string;
+  heroTitle: string;
+  heroDescription: string;
+  location: string;
+  emailContact: string;
+  phoneContact: string;
+}
 
 export default function AddComponent() {
   const [openCollapse, setOpenCollapse] = useState(false);
   const [filterModified, setFilterModified] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: '',
     subDomain: '',
     location: '',
@@ -49,7 +64,7 @@ export default function AddComponent() {
     socialMediaLinks: [''],
     features: [{ title: '', description: '' }],
   });
-  const [filterValues, setFilterValues] = useState({
+  const [filterValues, setFilterValues] = useState<FilterValues>({
     name: '',
     subDomain: '',
     heroTitle: '',
@@ -110,7 +125,7 @@ export default function AddComponent() {
       emailContact: '',
       phoneContact: '',
     });
-    setFilterModified(false); // Reset filter modified state
+    setFilterModified(false);
   };
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,14 +134,12 @@ export default function AddComponent() {
       ...prev,
       [name]: value,
     }));
-    // Set filterModified to true if any filter value is not empty
-    const isModified = Object.values({ ...filterValues, [name]: value }).some(v => v.trim() !== '');
+    const isModified = Object.values({ ...filterValues, [name]: value }).some((v) => v.trim() !== '');
     setFilterModified(isModified);
   };
 
   useEffect(() => {
-    // Check if any filter values are non-empty
-    const isModified = Object.values(filterValues).some(v => v.trim() !== '');
+    const isModified = Object.values(filterValues).some((v) => v.trim() !== '');
     setFilterModified(isModified);
   }, [filterValues]);
 
@@ -134,7 +147,6 @@ export default function AddComponent() {
 
   return (
     <div>
-      {/* nav bar (search && filter && add)---------------------------------------------------------------*/}
       <Box
         sx={{
           width: '100%',
@@ -143,171 +155,43 @@ export default function AddComponent() {
           borderRadius: 1,
           display: 'flex',
           justifyContent: 'space-between',
-          bgcolor: 'background.paper'
+          bgcolor: 'background.paper',
         }}
       >
-        <div className='flex gap-4 items-center'>
-          <TextField
-            type="search"
-            placeholder="search"
-            InputLabelProps={{
-              shrink: false,
-            }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-              sx: {
-                padding: '9px 12px',
-              },
-            }}
-            variant="outlined"
-            sx={{
-              '& .MuiInputBase-input': {
-                padding: '0px',
-                height: '0',
-              }
-            }}
-          />
+        <div className="flex gap-4 items-center">
+          <SearchField />
           <Button
             variant={isFilterButtonPrimary ? 'contained' : 'text'}
             color={isFilterButtonPrimary ? 'primary' : 'grey'}
             startIcon={<FilterAltIcon />}
             onClick={handleToggleCollapse}
-            className='h-10'
+            className="h-10"
           >
             Filter
           </Button>
         </div>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenDialog} className='h-10'>
+        <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenDialog} className="h-10">
           Add new company
         </Button>
       </Box>
-      {/* nav bar ends here ------------------------------------------------------------------------------*/}
-
-      {/* filter section opens when you click on filter button in the nav (look up) ----------------------*/}
-      <Box>
-        <Collapse in={openCollapse} timeout="auto" unmountOnExit>
-          <Box mt={2} p={6} borderRadius={1} sx={{ bgcolor: 'background.paper' }}>
-            <Typography variant="h5" gutterBottom className="flex gap-4 items-center">
-              Filter
-              <Button variant="text" startIcon={<RestartAltIcon />} onClick={handleResetFilter} className='h-10'>
-                Reset filter
-              </Button>
-            </Typography>
-            <div className="flex gap-3">
-              <TextField
-                name="name"
-                label="Name"
-                variant="outlined"
-                fullWidth
-                margin="normal"
-                size="small"
-                value={filterValues.name}
-                onChange={handleFilterChange}
-              />
-              <TextField
-                name="subDomain"
-                label="Sub domain"
-                variant="outlined"
-                fullWidth
-                margin="normal"
-                size="small"
-                value={filterValues.subDomain}
-                onChange={handleFilterChange}
-              />
-            </div>
-            <div className="flex gap-3">
-              <TextField
-                name="heroTitle"
-                label="Hero Title"
-                variant="outlined"
-                fullWidth
-                margin="normal"
-                size="small"
-                value={filterValues.heroTitle}
-                onChange={handleFilterChange}
-              />
-              <TextField
-                name="heroDescription"
-                label="Hero Description"
-                variant="outlined"
-                fullWidth
-                margin="normal"
-                size="small"
-                value={filterValues.heroDescription}
-                onChange={handleFilterChange}
-              />
-            </div>
-            <div className="flex gap-3">
-              <TextField
-                name="location"
-                label="Location"
-                variant="outlined"
-                fullWidth
-                margin="normal"
-                size="small"
-                value={filterValues.location}
-                onChange={handleFilterChange}
-              />
-              <TextField
-                name="emailContact"
-                label="Email Contact"
-                variant="outlined"
-                fullWidth
-                margin="normal"
-                size="small"
-                value={filterValues.emailContact}
-                onChange={handleFilterChange}
-              />
-            </div>
-            <div className="flex gap-3">
-              <TextField
-                name="phoneContact"
-                label="Phone Contact"
-                variant="outlined"
-                fullWidth
-                margin="normal"
-                size="small"
-                value={filterValues.phoneContact}
-                onChange={handleFilterChange}
-              />
-            </div>
-          </Box>
-        </Collapse>
-      </Box>
-      {/* filter section ends here */}
-
-      <Dialog
-        open={openDialog}
-        onClose={handleCloseDialog}
-        maxWidth="md"
-        fullWidth
-        PaperProps={{ sx: { height: '80vh' } }}
-      >
-        <DialogTitle className='grid gap-4 '>
-          Add Company
-          <CompanyStepper steps={steps} activeStep={activeStep} />
-        </DialogTitle>
-        <DialogContent>
-          <CompanyForm step={activeStep} formData={formData} setFormData={setFormData} />
-          {error && <Alert severity="error">{error}</Alert>}
-          {loading && <CircularProgress />}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog} color="primary">Close</Button>
-          <Button disabled={activeStep === 0} onClick={() => handleStepChange(-1)} color="primary">Back</Button>
-          <Button
-            onClick={() => handleStepChange(1)}
-            color="primary"
-            disabled={loading}
-          >
-            {activeStep === steps.length - 1 ? (loading ? <CircularProgress size={24} /> : 'Add') : 'Next'}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <FilterSection
+        openCollapse={openCollapse}
+        filterValues={filterValues}
+        handleFilterChange={handleFilterChange}
+        handleResetFilter={handleResetFilter}
+      />
+      <CompanyDialog
+        openDialog={openDialog}
+        handleCloseDialog={handleCloseDialog}
+        activeStep={activeStep}
+        handleStepChange={handleStepChange}
+        formData={formData}
+        setFormData={setFormData}
+        steps={steps}
+        handleSubmit={handleSubmit}
+        loading={loading}
+        error={error}
+      />
       <Snackbar
         open={success}
         autoHideDuration={6000}
