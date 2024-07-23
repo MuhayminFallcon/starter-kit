@@ -7,6 +7,7 @@ import SearchField from './SearchField';
 import FilterSection from './FilterSection';
 import CompanyDialog from './CompanyDialog';
 import { API_URL } from '@/services/companyService'
+import { id } from 'postcss-selector-parser'
 
 const steps = ['Basic Information', 'Hero Section', 'Section Details', 'Products and Services', 'Additional Information'];
 
@@ -99,14 +100,15 @@ export default function AddComponent() {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      await axios.post(`${API_URL}/companies`, formData, {
+      await axios.put(`${API_URL}/companies/${id}`, formData, {
         headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
+          Accept: 'text/plain',
+          'Content-Type': 'application/json-patch+json',
         },
       });
       setSuccess(true);
       handleCloseDialog();
+      window.location.reload();
     } catch (error) {
       console.error('Error submitting form:', error);
       setError('Error submitting form. Please try again later.');

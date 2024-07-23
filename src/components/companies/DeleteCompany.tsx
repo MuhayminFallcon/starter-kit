@@ -17,19 +17,18 @@ const DeleteCompany = ({ companyId, onDeleteSuccess }) => {
   };
 
   const handleDelete = async () => {
-
-      const response = await axios.delete(`${API_URL}/companies/${companyId}`, {
-        headers: {
-          'accept': 'text/plain',
-        }
-      });
+    try {
+      const response = await axios.delete(`${API_URL}/companies/${companyId}`);
       if (response.status === 200) {
-        onDeleteSuccess(companyId);
-        setOpen(false);
+        window.location.reload(); // Refresh the page if the deletion was successful
       } else {
-        throw new Error('Failed to delete company');
+        console.error('Deletion failed with status:', response.status);
+        // Optionally, handle non-200 responses here
       }
-
+    } catch (error) {
+      console.error('Error during deletion:', error);
+      setError('Failed to delete company. Please try again.'); // Optionally, set an error state to display the error message to the user
+    }
   };
 
   return (

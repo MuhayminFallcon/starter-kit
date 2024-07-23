@@ -23,6 +23,7 @@
     "@mui/lab": "5.0.0-alpha.170",
     "@mui/material": "^5.15.20",
     "@mui/material-nextjs": "5.15.11",
+    "@mui/x-data-grid": "^7.11.0",
     "axios": "^1.7.2",
     "classnames": "2.5.1",
     "formik": "^2.4.6",

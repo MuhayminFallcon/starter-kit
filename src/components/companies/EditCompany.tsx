@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -58,7 +58,7 @@ export default function EditComponent({ id }: EditComponentProps) {
     }
   }, [openDialog]);
 
-  const fetchCompanyData = async () => {
+  const fetchCompanyData = useCallback(async () => {
     setLoading(true);
     try {
       const response = await axios.get(`${API_URL}/companies/${id}`);
@@ -69,7 +69,7 @@ export default function EditComponent({ id }: EditComponentProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
   const handleOpenDialog = () => setOpenDialog(true);
   const handleCloseDialog = () => {
@@ -86,24 +86,28 @@ export default function EditComponent({ id }: EditComponentProps) {
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     setLoading(true);
     try {
-      await axios.put(`${API_URL}/companies/${id}`, formData, {
+      const response = await axios.put(`${API_URL}/companies/${id}`, formData, {
         headers: {
-          Accept: 'text/plain',
-          'Content-Type': 'application/json-patch+json',
+          'Content-Type': 'application/json',
         },
       });
-      setSuccess(true);
-      handleCloseDialog();
+      if (response.status === 200) {
+        setSuccess(true);
+        window.location.reload(); // Refresh the page on successful update
+      } else {
+        console.error('Update failed with status:', response.status);
+        setError('Update failed. Please try again.');
+      }
     } catch (error) {
-      console.error('Error submitting form:', error);
-      setError('Error submitting form. Please try again later.');
+      console.error('Error during update:', error);
+      setError('Error during update. Please try again.');
     } finally {
       setLoading(false);
     }
-  };
+  }, [formData, id]);
 
   return (
     <div>

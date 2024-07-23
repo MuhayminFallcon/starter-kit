@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, IconButton } from '@mui/material';
+import { CircularProgress, Paper } from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid';
 import { CompanyService, Company } from '@/services/companyService';
 import EditComponent from '@components/companies/EditCompany';
 import DeleteCompany from '@components/companies/DeleteCompany';
@@ -8,12 +9,44 @@ const CompanyCard = () => {
   const [data, setData] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sort, setSort] = useState({});
+  const [filter, setFilter] = useState({
+    PageNumber: 0,
+    PageSize: 10,
+    TotalCount: 0,
+  });
+
+  const columns = [
+    { field: 'name', headerName: 'Name', width: 150 },
+    { field: 'subDomain', headerName: 'SubDomain', width: 150 },
+    { field: 'heroTitle', headerName: 'Hero Title', width: 200 },
+    { field: 'heroDescription', headerName: 'Hero Description', width: 200 },
+    { field: 'location', headerName: 'Location', width: 150 },
+    { field: 'emailContact', headerName: 'Email Contact', width: 200 },
+    { field: 'phoneContact', headerName: 'Phone Contact', width: 150 },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 150,
+      renderCell: (params) => (
+        <div className="flex gap-2 items-center">
+          <EditComponent id={params.row.id} />
+          <DeleteCompany companyId={params.row.id} />
+        </div>
+      ),
+    },
+  ];
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
         const response = await CompanyService.fetchCompanies();
         setData(response.data);
+        setFilter((prev) => ({
+          ...prev,
+          TotalCount: response.totalCount,
+        }));
       } catch (error) {
         setError("Something went wrong! Can't fetch the data");
       } finally {
@@ -22,56 +55,46 @@ const CompanyCard = () => {
     };
 
     fetchData();
-  }, []);
+  }, [sort, filter.PageNumber, filter.PageSize]);
 
   return (
-    <TableContainer component={Paper}>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Name</TableCell>
-            <TableCell>SubDomain</TableCell>
-            <TableCell>Hero Title</TableCell>
-            <TableCell>Hero Description</TableCell>
-            <TableCell>Location</TableCell>
-            <TableCell>Email Contact</TableCell>
-            <TableCell>Phone Contact</TableCell>
-            <TableCell>Actions</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {loading ? (
-            <TableRow>
-              <TableCell colSpan={8} style={{ textAlign: 'center' }}>
-                <CircularProgress />
-              </TableCell>
-            </TableRow>
-          ) : error ? (
-            <TableRow>
-              <TableCell colSpan={8} style={{ textAlign: 'center', color: 'red' }}>
-                {error}
-              </TableCell>
-            </TableRow>
-          ) : (
-            data.map((  company) => (
-              <TableRow key={company.id}>
-                <TableCell>{company.name}</TableCell>
-                <TableCell>{company.subDomain}</TableCell>
-                <TableCell>{company.heroTitle}</TableCell>
-                <TableCell>{company.heroDescription}</TableCell>
-                <TableCell>{company.location}</TableCell>
-                <TableCell>{company.emailContact}</TableCell>
-                <TableCell>{company.phoneContact}</TableCell>
-                <TableCell className="flex gap-2 items-center">
-                  <EditComponent id={company.id}/>
-                  <DeleteCompany companyId={company.id} />
-                </TableCell>
-              </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
-    </TableContainer>
+    <Paper style={{ height: 'auto', width: '100%' }}>
+      {loading ? (
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
+          <CircularProgress />
+        </div>
+      ) : error ? (
+        <div style={{ textAlign: 'center', color: 'red', padding: '20px' }}>
+          {error}
+        </div>
+      ) : (
+        <DataGrid
+          autoHeight
+          rowHeight={62}
+          rows={data}
+          loading={loading}
+          columns={columns}
+          paginationMode="server"
+          pagination
+          sortingMode="server"
+          onSortModelChange={(e) => (!!e[0] ? setSort(e[0]) : setSort({}))}
+          disableRowSelectionOnClick
+          disableColumnMenu
+          pageSizeOptions={[10, 25, 50]}
+          page={filter.PageNumber}
+          pageSize={filter.PageSize}
+          rowCount={filter.TotalCount}
+          paginationModel={{ page: filter.PageNumber, pageSize: filter.PageSize }}
+          onPaginationModelChange={(model) => {
+            setFilter((prev) => ({
+              ...prev,
+              PageNumber: model.page,
+              PageSize: model.pageSize,
+            }));
+          }}
+        />
+      )}
+    </Paper>
   );
 };
 
