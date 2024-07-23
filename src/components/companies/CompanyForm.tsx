@@ -18,7 +18,12 @@ const CompanyForm = ({ step, formData, setFormData }: CompanyFormProps) => {
       setUploading(true);
       try {
         const imagePaths = await uploadImage(value);
-        setFormData((prevData) => ({ ...prevData, [field]: imagePaths }));
+        const multipleImageFields = ['productsImages', 'servicesImages'];
+        if (multipleImageFields.includes(field)) {
+          setFormData((prevData) => ({ ...prevData, [field]: imagePaths }));
+        } else {
+          setFormData((prevData) => ({ ...prevData, [field]: typeof imagePaths === 'string' ? imagePaths : imagePaths[0] }));
+        }
       } finally {
         setUploading(false);
       }
@@ -49,24 +54,22 @@ const CompanyForm = ({ step, formData, setFormData }: CompanyFormProps) => {
     }));
   };
 
-  const uploadImage = async (files: FileList | File[]): Promise<string[]> => {
+  const uploadImage = async (files: FileList | File[]): Promise<string | string[]> => {
     const formData = new FormData();
     const fileArray = Array.isArray(files) ? files : Array.from(files);
-    if (fileArray.length === 1) {
-      formData.append('file', fileArray[0]);
-    } else {
-      fileArray.forEach(file => formData.append('files', file));
-    }
+    fileArray.forEach(file => formData.append('files', file));
 
     try {
       const response = await axios.post(`${API_URL}/file/multi`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      // Assuming the server responds with the paths of the uploaded files
+      if (fileArray.length === 1) {
+        return response.data[0];
+      }
       return response.data;
     } catch (error) {
       console.error('Error uploading image:', error);
-      return [];
+      return fileArray.length === 1 ? '' : [];
     }
   };
 
