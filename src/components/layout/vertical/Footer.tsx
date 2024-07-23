@@ -4,9 +4,11 @@ import FooterContent from './FooterContent'
 
 const Footer = () => {
   return (
-    <LayoutFooter>
-      <FooterContent />
-    </LayoutFooter>
+    <div>
+     {/*  <LayoutFooter>
+        <FooterContent />
+      </LayoutFooter>  */}
+    </div>
   )
 }
 

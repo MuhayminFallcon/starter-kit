@@ -68,7 +68,7 @@ const CompanyFormLayout = ({
     ),
   };
   return (
-    <Box sx={{ '& > :not(style)': { m: 1, width: '100%' } }} noValidate autoComplete="off">
+    <Box sx={{ '& > :not(style)': { m: 1, width: '100%' } }} noValidate autoComplete="off" className="grid gap-4 mt-4 ">
       {stepFields[step]}
     </Box>
   );
