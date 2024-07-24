@@ -100,15 +100,14 @@ export default function AddComponent() {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      await axios.put(`${API_URL}/companies/${id}`, formData, {
+      await axios.post(`${API_URL}/companies`, formData, {
         headers: {
-          Accept: 'text/plain',
-          'Content-Type': 'application/json-patch+json',
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
         },
       });
       setSuccess(true);
       handleCloseDialog();
-      window.location.reload();
     } catch (error) {
       console.error('Error submitting form:', error);
       setError('Error submitting form. Please try again later.');
@@ -116,6 +115,7 @@ export default function AddComponent() {
       setLoading(false);
     }
   };
+
 
   const handleResetFilter = () => {
     setFilterValues({

@@ -1,5 +1,6 @@
 import { Box, TextField, Button, IconButton } from '@mui/material';
 import { Add, Remove } from '@mui/icons-material';
+import { ChromePicker } from 'react-color';
 
 type CompanyFormLayoutProps = {
   step: number;
@@ -44,6 +45,11 @@ const CompanyFormLayout = ({
                              handleAddToArray,
                              handleRemoveFromArray,
                            }: CompanyFormLayoutProps) => {
+
+  const handleColorChange = (color, field) => {
+    handleChange(field, color.hex);
+  };
+
   const stepFields: { [key: number]: JSX.Element } = {
     0: (
       <>
@@ -71,7 +77,6 @@ const CompanyFormLayout = ({
     3: (
       <>
         <Field id="productsImages" label="Product Image" value={formData.productsImages} onChange={handleChange} type="file" multiple />
-        <Field id="servicesImages" label="Service Image" value={formData.servicesImages} onChange={handleChange} type="file" multiple />
         <Box>
           <Button variant="contained" color="primary" onClick={() => handleAddToArray('features')}>
             Add Feature
@@ -99,6 +104,20 @@ const CompanyFormLayout = ({
               </IconButton>
             </Box>
           ))}
+        </Box>
+        <Box>
+          <label>Primary Color</label>
+          <ChromePicker
+            color={formData.primaryColor}
+            onChange={(color) => handleColorChange(color, 'primaryColor')}
+          />
+        </Box>
+        <Box>
+          <label>Secondary Color</label>
+          <ChromePicker
+            color={formData.secondaryColor}
+            onChange={(color) => handleColorChange(color, 'secondaryColor')}
+          />
         </Box>
       </>
     ),

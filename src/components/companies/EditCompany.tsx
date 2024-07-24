@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -21,6 +21,14 @@ const steps = ['Basic Information', 'Hero Section', 'Section Details', 'Products
 interface EditComponentProps {
   id: string;
 }
+
+const sanitizeImageUrls = (urls: string[]): string[] => {
+  return urls.map(url => {
+    // Extract the path after the base URL
+    const baseUrlPattern = /^http:\/\/localhost:5152\//;
+    return url.replace(baseUrlPattern, '');
+  });
+};
 
 export default function EditComponent({ id }: EditComponentProps) {
   const [openDialog, setOpenDialog] = useState(false);
@@ -58,7 +66,7 @@ export default function EditComponent({ id }: EditComponentProps) {
     }
   }, [openDialog]);
 
-  const fetchCompanyData = useCallback(async () => {
+  const fetchCompanyData = async () => {
     setLoading(true);
     try {
       const response = await axios.get(`${API_URL}/companies/${id}`);
@@ -69,7 +77,7 @@ export default function EditComponent({ id }: EditComponentProps) {
     } finally {
       setLoading(false);
     }
-  }, [id]);
+  };
 
   const handleOpenDialog = () => setOpenDialog(true);
   const handleCloseDialog = () => {
@@ -82,32 +90,33 @@ export default function EditComponent({ id }: EditComponentProps) {
     if (activeStep === steps.length - 1 && stepChange === 1) {
       handleSubmit();
     } else {
-      setActiveStep((prev) => prev + stepChange);
+      setActiveStep(prev => prev + stepChange);
     }
   };
 
-  const handleSubmit = useCallback(async () => {
+  const handleSubmit = async () => {
     setLoading(true);
     try {
-      const response = await axios.put(`${API_URL}/companies/${id}`, formData, {
+      const sanitizedFormData = {
+        ...formData,
+        productsImages: sanitizeImageUrls(formData.productsImages),
+        servicesImage: sanitizeImageUrls(formData.servicesImage),
+      };
+      await axios.put(`${API_URL}/companies/${id}`, sanitizedFormData, {
         headers: {
-          'Content-Type': 'application/json',
+          Accept: 'text/plain',
+          'Content-Type': 'application/json-patch+json',
         },
       });
-      if (response.status === 200) {
-        setSuccess(true);
-        window.location.reload(); // Refresh the page on successful update
-      } else {
-        console.error('Update failed with status:', response.status);
-        setError('Update failed. Please try again.');
-      }
+      setSuccess(true);
+      handleCloseDialog();
     } catch (error) {
-      console.error('Error during update:', error);
-      setError('Error during update. Please try again.');
+      console.error('Error submitting form:', error);
+      setError('Error submitting form. Please try again later.');
     } finally {
       setLoading(false);
     }
-  }, [formData, id]);
+  };
 
   return (
     <div>
