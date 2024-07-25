@@ -1,5 +1,18 @@
+'use strict';
+
+import React from 'react';
+import SubscriptionChart from '@/components/companies/SubscriptionChart';
 import SearchField from '@components/companies/SearchField'
 
-export default function Page() {
-  return <h1><SearchField></SearchField></h1>
-}
+const Home = () => {
+  return (
+    <div>
+      <h1>Home</h1>
+      <SearchField />
+
+      <SubscriptionChart />
+    </div>
+  );
+};
+
+export default Home;

@@ -17,11 +17,19 @@ const CompanyCard = () => {
   });
 
   const columns = [
+    {
+      field: 'number',
+      headerName: '#',
+      width: 70,
+      renderCell: (params) => {
+        // Calculate the index based on the row index within the current page
+        const index = params.api.getAllRowIds().indexOf(params.id);
+        return filter.PageNumber * filter.PageSize + index + 1;
+      },
+    },
     { field: 'name', headerName: 'Name', width: 150 },
     { field: 'subDomain', headerName: 'SubDomain', width: 150 },
-    { field: 'heroTitle', headerName: 'Hero Title', width: 200 },
-    { field: 'heroDescription', headerName: 'Hero Description', width: 200 },
-    { field: 'location', headerName: 'Location', width: 150 },
+    { field: 'subscriptionEndDate', headerName: 'Subscription End Date', width: 150 },
     { field: 'emailContact', headerName: 'Email Contact', width: 200 },
     { field: 'phoneContact', headerName: 'Phone Contact', width: 150 },
     {
@@ -77,7 +85,7 @@ const CompanyCard = () => {
           paginationMode="server"
           pagination
           sortingMode="server"
-          onSortModelChange={(e) => (!!e[0] ? setSort(e[0]) : setSort({}))}
+          onSortModelChange={(model) => setSort(model.length ? model[0] : {})}
           disableRowSelectionOnClick
           disableColumnMenu
           pageSizeOptions={[10, 25, 50]}
@@ -92,6 +100,7 @@ const CompanyCard = () => {
               PageSize: model.pageSize,
             }));
           }}
+          getRowId={(row) => row.id} // Ensure each row has a unique identifier
         />
       )}
     </Paper>

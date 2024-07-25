@@ -23,6 +23,7 @@
     "@mui/lab": "5.0.0-alpha.170",
     "@mui/material": "^5.15.20",
     "@mui/material-nextjs": "5.15.11",
+    "@mui/x-charts": "^7.11.0",
     "@mui/x-data-grid": "^7.11.0",
     "axios": "^1.7.2",
     "classnames": "2.5.1",
@@ -38,6 +39,7 @@
     "react-i18next": "^15.0.0",
     "react-perfect-scrollbar": "1.5.8",
     "react-use": "17.5.0",
+    "recharts": "^2.12.7",
     "server-only": "0.0.1",
     "vite": "^5.3.4",
     "yup": "^1.4.0"
