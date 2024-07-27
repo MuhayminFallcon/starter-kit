@@ -32,20 +32,16 @@ const CompanyForm = ({ step, formData, setFormData }: CompanyFormProps) => {
     }
   };
 
-  const handleArrayChange = (arrayField: string, index: number, field: string, value: any) => {
+  const handleArrayChange = (arrayField: string, index: number, value: any) => {
     setFormData((prevData) => {
       const updatedArray = [...prevData[arrayField]];
-      updatedArray[index] = {
-        ...updatedArray[index],
-        [field]: value,
-      };
+      updatedArray[index] = value;
       return {
         ...prevData,
         [arrayField]: updatedArray,
       };
     });
   };
-
 
   const handleAddToArray = (arrayField: string) => {
     setFormData((prevData) => ({

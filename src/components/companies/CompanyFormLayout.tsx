@@ -1,3 +1,4 @@
+// src/components/companies/CompanyFormLayout.tsx
 import { Box, TextField, Button, IconButton } from '@mui/material';
 import { Add, Remove } from '@mui/icons-material';
 import { ChromePicker } from 'react-color';
@@ -6,7 +7,7 @@ type CompanyFormLayoutProps = {
   step: number;
   formData: any;
   handleChange: (field: string, value: any) => void;
-  handleArrayChange: (arrayField: string, index: number, field: string, value: any) => void;
+  handleArrayChange: (arrayField: string, index: number, value: any) => void;
   handleAddToArray: (arrayField: string) => void;
   handleRemoveFromArray: (arrayField: string, index: number) => void;
 };
@@ -87,13 +88,13 @@ const CompanyFormLayout = ({
                 id={`features[${index}].title`}
                 label="Feature Title"
                 value={feature.title}
-                onChange={(field, value) => handleArrayChange('features', index, 'title', value)}
+                onChange={(field, value) => handleArrayChange('features', index, { ...feature, title: value })}
               />
               <Field
                 id={`features[${index}].description`}
                 label="Feature Description"
                 value={feature.description}
-                onChange={(field, value) => handleArrayChange('features', index, 'description', value)}
+                onChange={(field, value) => handleArrayChange('features', index, { ...feature, description: value })}
               />
               <IconButton
                 aria-label="remove feature"
@@ -125,6 +126,28 @@ const CompanyFormLayout = ({
       <>
         <Field id="location" label="Location" value={formData.location} onChange={handleChange} />
         <Field id="logoImage" label="Logo Image" value={formData.logoImage} onChange={handleChange} type="file" multiple />
+        <Box>
+          <Button variant="contained" color="primary" onClick={() => handleAddToArray('socialMediaLinks')}>
+            Add Social Media Link
+          </Button>
+          {formData.socialMediaLinks.map((link: string, index: number) => (
+            <Box key={index} display="flex" alignItems="center" mb={2}>
+              <Field
+                id={`socialMediaLinks[${index}]`}
+                label="Social Media Link"
+                value={link}
+                onChange={(field, value) => handleArrayChange('socialMediaLinks', index, value)}
+              />
+              <IconButton
+                aria-label="remove link"
+                color="secondary"
+                onClick={() => handleRemoveFromArray('socialMediaLinks', index)}
+              >
+                <Remove />
+              </IconButton>
+            </Box>
+          ))}
+        </Box>
       </>
     ),
   };
