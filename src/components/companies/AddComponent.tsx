@@ -1,15 +1,15 @@
+'use client'
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Box, Button, Collapse, Dialog, Snackbar, Alert, CircularProgress } from '@mui/material';
+import { Box, Button, Collapse, Snackbar, Alert, CircularProgress } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import SearchField from './SearchField';
 import FilterSection from './FilterSection';
 import CompanyDialog from './CompanyDialog';
-import { API_URL } from '@/services/companyService'
-import { id } from 'postcss-selector-parser'
+import { API_URL } from '@/services/companyService';
 
-const steps = ['Basic Information', 'Hero Section', 'Section Details', 'Products and Services', 'Additional Information'];
+const steps = ['Basic Information', 'Create Website', ];
 
 interface FormData {
   name: string;
@@ -78,7 +78,11 @@ export default function AddComponent() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const handleOpenDialog = () => setOpenDialog(true);
+  const handleOpenDialog = () => {
+    setOpenDialog(true);
+    setActiveStep(0);
+  };
+
   const handleCloseDialog = () => {
     setOpenDialog(false);
     setActiveStep(0);
@@ -102,8 +106,8 @@ export default function AddComponent() {
     try {
       await axios.post(`${API_URL}/companies`, formData, {
         headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
+          Accept: 'text/plain',
+          'Content-Type': 'application/json-patch+json',
         },
       });
       setSuccess(true);
@@ -115,7 +119,6 @@ export default function AddComponent() {
       setLoading(false);
     }
   };
-
 
   const handleResetFilter = () => {
     setFilterValues({
