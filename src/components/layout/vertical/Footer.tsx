@@ -2,14 +2,14 @@
 import LayoutFooter from '@layouts/components/vertical/Footer'
 import FooterContent from './FooterContent'
 
-const Footer = () => {
+const BaseFooter = () => {
   return (
     <div>
-     {/*  <LayoutFooter>
+      {/*  <LayoutFooter>
         <FooterContent />
       </LayoutFooter>  */}
     </div>
   )
 }
 
-export default Footer
+export default BaseFooter

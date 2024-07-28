@@ -22,7 +22,6 @@ const CompanyCard = () => {
       headerName: '#',
       width: 70,
       renderCell: (params) => {
-        // Calculate the index based on the row index within the current page
         const index = params.api.getAllRowIds().indexOf(params.id);
         return filter.PageNumber * filter.PageSize + index + 1;
       },
