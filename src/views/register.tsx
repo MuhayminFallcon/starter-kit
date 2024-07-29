@@ -63,6 +63,7 @@ const MaskImg = styled('img')({
 const LoginV2 = ({ mode }: { mode: SystemMode }) => {
   // States
   const [form, setForm] = useState({
+    fullName: '',
     email: '',
     password: '',
     remember: false,
@@ -103,15 +104,16 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
     }))
   }
 
-  const login = async () => {
+  const Register = async () => {
     try {
       const data = {
+        fullName: form.fullName,
         email: form.email,
         password: form.password,
       }
-      const response = await axios.post('http://100.42.190.178:3387/api/login', data)
+      const response = await axios.post('http://100.42.190.178:3387/api/register', data)
       localStorage.setItem('auth_token', response.data.token)
-      router.push('/')
+      router.push('/login')
     } catch (error) {
       console.log('Failed:', error)
       setForm((prevForm) => ({
@@ -147,17 +149,25 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
         <div className='flex flex-col gap-6 is-full sm:is-auto md:is-full sm:max-is-[400px] md:max-is-[unset] mbs-11 sm:mbs-14 md:mbs-0'>
           <div className='flex flex-col gap-1'>
             <Typography variant='h4'>{`Welcome to ${themeConfig.templateName}! 👋🏻`}</Typography>
-            <Typography>Please sign-in to your account and start the adventure</Typography>
+            <Typography>Register a new account</Typography>
           </div>
           <form
             noValidate
             autoComplete='off'
             onSubmit={(e: FormEvent<HTMLFormElement>) => {
               e.preventDefault()
-              login()
+              Register()
             }}
             className='flex flex-col gap-5'
           >
+            <CustomTextField
+              fullWidth
+              label='Full Name'
+              placeholder='Enter your name'
+              name='fullName'
+              value={form.fullName}
+              onChange={handleChange}
+            />
             <CustomTextField
               autoFocus
               fullWidth
@@ -198,17 +208,14 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
                 }
                 label='Remember me'
               />
-              <Typography className='text-end' color='primary' component={Link}>
-                Forgot password?
-              </Typography>
             </div>
             <Button fullWidth variant='contained' type='submit'>
-              Login
+              Register
             </Button>
             <div className='flex justify-center items-center flex-wrap gap-2'>
-              <Typography>New on our platform?</Typography>
-              <Typography onClick={() => router.push('/register')} style={{ cursor: 'pointer' }} color='primary'>
-                Create an account
+              <Typography>Already have account?</Typography>
+              <Typography onClick={() => router.push('/login')} style={{ cursor: 'pointer' }} color='primary'>
+                Login
               </Typography>
             </div>
             <Divider className='gap-2 text-textPrimary'>or</Divider>
