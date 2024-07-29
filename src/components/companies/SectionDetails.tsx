@@ -5,42 +5,22 @@ import { Edit } from '@mui/icons-material';
 import { uploadImage } from '@/utils/imageUploader'; // Ensure the path is correct
 
 type SectionDetailsProps = {
-  sectionData?: {
-    sectionTitle?: string;
-    sectionDescription?: string;
-    sectionImage?: string;
-    redirectUrl?: string;
-    secondaryColor?: string;
-  };
-  onSectionDataChange?: (newSectionData: any) => void;
+  formData: any;
+  setFormData: (data: any) => void;
 };
 
-const SectionDetails = ({ sectionData = {}, onSectionDataChange }: SectionDetailsProps) => {
-  const [editableSectionData, setEditableSectionData] = useState(sectionData);
+const SectionDetails = ({ formData, setFormData }: SectionDetailsProps) => {
   const [localImage, setLocalImage] = useState(null); // State to store local image URL
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const fileInputRef = useRef(null);
 
-  const placeholderData = {
-    sectionTitle: 'Default Title',
-    sectionDescription: 'Default description here.',
-    sectionImage: '/path/to/placeholder/image.jpg', // Replace with actual placeholder image path
-    redirectUrl: '#',
-    secondaryColor: 'rgba(0, 0, 0, 0.5)', // Example color
-  };
-
-  const data = { ...placeholderData, ...editableSectionData };
-
   const handleFieldChange = (field, value) => {
-    setEditableSectionData((prevData) => ({ ...prevData, [field]: value }));
+    setFormData((prevData) => ({ ...prevData, [field]: value }));
   };
 
   const handleSave = () => {
-    if (typeof onSectionDataChange === 'function') {
-      onSectionDataChange(editableSectionData);
-    }
     setIsEditingTitle(false);
     setIsEditingDescription(false);
     setIsDialogOpen(false);
@@ -70,14 +50,14 @@ const SectionDetails = ({ sectionData = {}, onSectionDataChange }: SectionDetail
               variant="outlined"
               fullWidth
               label="Section Title"
-              value={editableSectionData.sectionTitle}
+              value={formData.sectionTitle || ''}
               onChange={(e) => handleFieldChange('sectionTitle', e.target.value)}
               onBlur={() => setIsEditingTitle(false)}
               autoFocus
             />
           ) : (
             <Typography variant="h4" component="h2" gutterBottom onClick={() => setIsEditingTitle(true)} className="cursor-pointer">
-              {data.sectionTitle}
+              {formData.sectionTitle || 'Default Title'}
             </Typography>
           )}
           {isEditingDescription ? (
@@ -85,17 +65,17 @@ const SectionDetails = ({ sectionData = {}, onSectionDataChange }: SectionDetail
               variant="outlined"
               fullWidth
               label="Section Description"
-              value={editableSectionData.sectionDescription}
+              value={formData.sectionDescription || ''}
               onChange={(e) => handleFieldChange('sectionDescription', e.target.value)}
               onBlur={() => setIsEditingDescription(false)}
               autoFocus
             />
           ) : (
             <Typography variant="body1" gutterBottom onClick={() => setIsEditingDescription(true)} className="cursor-pointer">
-              {data.sectionDescription}
+              {formData.sectionDescription || 'Default description here.'}
             </Typography>
           )}
-          {data.redirectUrl && (
+          {formData.redirectUrl && (
             <Box display="flex" justifyContent="flex-end" mt={2}>
               <Button
                 variant="contained"
@@ -119,8 +99,8 @@ const SectionDetails = ({ sectionData = {}, onSectionDataChange }: SectionDetail
             onChange={handleImageChange}
           />
           <Image
-            src={localImage || data.sectionImage}
-            alt={data.sectionTitle || "Section Image"}
+            src={localImage || formData.sectionImage || '/path/to/placeholder/image.jpg'}
+            alt={formData.sectionTitle || 'Section Image'}
             layout="responsive"
             width={400} // Adjusted width
             height={300} // Adjusted height
@@ -136,7 +116,7 @@ const SectionDetails = ({ sectionData = {}, onSectionDataChange }: SectionDetail
           <TextField
             label="Redirect URL"
             fullWidth
-            value={editableSectionData.redirectUrl}
+            value={formData.redirectUrl || ''}
             onChange={(e) => handleFieldChange('redirectUrl', e.target.value)}
             autoFocus
           />
