@@ -131,3 +131,4 @@ const SectionDetails = ({ formData, setFormData }: SectionDetailsProps) => {
 };
 
 export default SectionDetails;
+
